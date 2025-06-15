@@ -2,7 +2,7 @@ const express = require("express");
 const { signInToken } = require("../middlewares/auth");
 const { validateData, validateSignIn } = require("../utils/validation");
 const { hashPassword, checkPassword } = require("../utils/hashing");
-const { userModel } = require("../models/user");
+const { UserModel } = require("../models/user");
 
 const authRouter = express.Router();
 
@@ -14,7 +14,7 @@ authRouter.post("/signup", async (req, res) => {
   // This function is for hashing of password
   const hashedPassword = await hashPassword(req.body.password);
 
-  const user = new userModel({
+  const user = new UserModel({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     emailId: req.body.emailId,
@@ -41,7 +41,7 @@ authRouter.post("/signin", async (req, res) => {
   validateSignIn(req.body);
 
   // Checking a email id
-  const isUserExist = await userModel.findOne({ emailId: req.body.emailId });
+  const isUserExist = await UserModel.findOne({ emailId: req.body.emailId });
 
   if (!isUserExist) {
     res.status(203).json({ message: "Email id is not match!" });
@@ -60,6 +60,7 @@ authRouter.post("/signin", async (req, res) => {
 
   try {
     const token = await signInToken(isUserExist._id);
+    res.cookie("token", token);
     // res.cookie("token", token);
     res.status(200).json({
       user: isUserExist,

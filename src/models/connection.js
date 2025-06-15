@@ -4,10 +4,12 @@ const connectionSchema = mongoose.Schema({
   fromUserId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: "users",
     index: true,
   },
   toUserId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
     required: true,
   },
   status: {
