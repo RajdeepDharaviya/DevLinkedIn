@@ -1,7 +1,6 @@
 const express = require("express");
 const { signInToken } = require("../middlewares/auth");
 const { validateData, validateSignIn } = require("../utils/validation");
-
 const { hashPassword, checkPassword } = require("../utils/hashing");
 const { userModel } = require("../models/user");
 

@@ -2,13 +2,15 @@ const express = require("express");
 const app = express();
 const { userModel } = require("./src/models/user");
 const cookieParser = require("cookie-parser");
-const { authRouter } = require("./src/routes/auth");
+const { authRouter } = require("./src/routes/user");
 const { profileRouter } = require("./src/routes/profile");
+const { connectionRouter } = require("./src/routes/connection");
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRouter);
 app.use(profileRouter);
+app.use(connectionRouter);
 
 // This api is for getting all users
 app.get("/feed", async (req, res) => {

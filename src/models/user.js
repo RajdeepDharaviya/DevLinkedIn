@@ -56,7 +56,8 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.methods.checkPassword = function () {};
 // creating a user model with required fields
-const userModel = mongoose.model("users", userSchema);
+const UserModel = mongoose.model("users", userSchema);
 
-module.exports = { userModel };
+module.exports = { UserModel };
