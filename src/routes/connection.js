@@ -151,8 +151,14 @@ connectionRouter.get("/user/requests/received", async (req, res) => {
 });
 
 // This api is for getting all users
-connectionRouter.get("/user/feeds", async (req, res) => {
+connectionRouter.get("/user/feed", async (req, res) => {
   try {
+
+    const page=req.query.page || 1;
+    let limit = req.query.limit || 5
+    limit = limit>10?10 :limit
+    const skip = (page - 1)*limit
+
     const userId=req.user._id;
     const usersConnections=await ConnectionRequestModel.find({
       $or:[{fromUserId:userId},{toUserId:userId}]
@@ -169,7 +175,7 @@ connectionRouter.get("/user/feeds", async (req, res) => {
     
     const users = await UserModel.find({
      $and:[{_id:{$nin:Array.from(hideFromUser)}},{_id:{$ne:userId}}]
-    }).select(USER_SAFE_DATA)
+    }).select(USER_SAFE_DATA).skip(skip).limit(limit)
     
     if (users.length !== 0) {
      return res.status(200).json({
