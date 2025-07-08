@@ -9,7 +9,7 @@ profileRouter.use(verifyToken);
 profileRouter.patch("/user/profile/update", async (req, res) => {
   try {
     const userId = req.user.id;
-    const NOT_ALLOWED_UPDATE = [
+    const ALLOWED_UPDATE = [
       "firstName",
       "lastName",
       "gender",
@@ -17,10 +17,10 @@ profileRouter.patch("/user/profile/update", async (req, res) => {
       "skills",
     ];
     const isAllowed = Object.keys(req.body).every((key) => {
-      return NOT_ALLOWED_UPDATE.includes(key);
+      return ALLOWED_UPDATE.includes(key);
     });
     if (!isAllowed) {
-      throw new Error("Email id updated in not allowed!");
+      throw new Error("EmailId update in not allowed!");
     }
     const user = await userModel.findByIdAndUpdate(userId, req.body, {
       returnDocument: "before",
@@ -44,7 +44,10 @@ profileRouter.get("/profile", async (req, res) => {
   const userId = req.params.id;
 
   try {
-    await userModel.findByIdAndDelete(userId);
+    const user=await userModel.findByIdAndDelete(userId);
+    if(!user) {
+      throw new Error("User not found!");
+    }
     res.status(200).json({
       message: "User deleted successfully!",
     });

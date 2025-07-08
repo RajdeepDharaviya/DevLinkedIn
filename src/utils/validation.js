@@ -13,7 +13,8 @@ const validateData = (body) => {
   if (!validator.isStrongPassword(password)) {
     throw new Error("Please enter strong password!");
   }
-  if (!validator.isNumeric(age)) {
+  
+  if (!isNaN(age)) {
     if (age < 0) {
       throw new Error("Please enter valid age!");
     }

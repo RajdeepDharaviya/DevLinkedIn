@@ -1,13 +1,16 @@
 const express = require("express");
-const { signInToken } = require("../middlewares/auth");
+const { signInToken, verifyToken } = require("../middlewares/auth");
 const { validateData, validateSignIn } = require("../utils/validation");
 const { hashPassword, checkPassword } = require("../utils/hashing");
 const { UserModel } = require("../models/user");
+const { ConnectionRequestModel } = require("../models/connection");
 
 const authRouter = express.Router();
 
 // This api is for adding user or signup
 authRouter.post("/signup", async (req, res) => {
+  console.log(req.body);
+  
   // This function is checking data is valid or not
   validateData(req.body);
 
@@ -39,7 +42,7 @@ authRouter.post("/signup", async (req, res) => {
 authRouter.post("/signin", async (req, res) => {
   // This function is checking data is valid or not
   validateSignIn(req.body);
-
+try {
   // Checking a email id
   const isUserExist = await UserModel.findOne({ emailId: req.body.emailId });
 
@@ -58,10 +61,9 @@ authRouter.post("/signin", async (req, res) => {
     return;
   }
 
-  try {
     const token = await signInToken(isUserExist._id);
     res.cookie("token", token);
-    // res.cookie("token", token);
+    
     res.status(200).json({
       user: isUserExist,
       token: token,
@@ -72,4 +74,21 @@ authRouter.post("/signin", async (req, res) => {
     });
   }
 });
+
+// This api is for getting user profile
+// authRouter.get("/feed",verifyToken,async (req,res)=>{
+//   const userId=req.user._id;
+//   const userConnections = await ConnectionRequestModel.find({
+//     $or:[{fromUserId:userId},{toUserId:userId}]
+//   })
+// console.log("connection requests :" ,userConnections);
+
+//   // if(!userConnections){
+//   //   return res.status(200).json({
+//   //     message:"Your feed is empty!"
+//   //   })
+//   // }
+
+
+// })
 module.exports = { authRouter };

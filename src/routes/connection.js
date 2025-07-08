@@ -1,8 +1,10 @@
 const express = require("express");
 const { ConnectionRequestModel } = require("../models/connection");
 const { verifyToken } = require("../middlewares/auth");
+const { UserModel } = require("../models/user");
 const connectionRouter = express.Router();
 connectionRouter.use(verifyToken);
+const USER_SAFE_DATA="firstName lastName emailId age gender skills"
 
 // This api is for sending a request
 connectionRouter.post(
@@ -82,10 +84,9 @@ connectionRouter.post(
 connectionRouter.get("/user/connections", async (req, res) => {
   const userId = req.user._id;
   const connections = await ConnectionRequestModel.find({
-    $or: [{ toUserId: userId }, { fromUserId: userId }],
-    status: "accepted",
-  })
-    .populate("fromUserId", [
+    $and:[{$or: [{ toUserId: userId }, { fromUserId: userId }]},
+    {status: "accepted",}]
+  }).populate("fromUserId", [
       "firstname",
       "lastname",
       "emailId",
@@ -102,9 +103,9 @@ connectionRouter.get("/user/connections", async (req, res) => {
 
   const connectionData = connections.map((connection) => {
     if (connection.fromUserId._id === userId) {
-      return connection.fromUserId;
+      return connection.toUserId;
     }
-    return connection.toUserId;
+    return connection.fromUserId;
   });
 
   if (!connections) {
@@ -148,4 +149,43 @@ connectionRouter.get("/user/requests/received", async (req, res) => {
     });
   }
 });
+
+// This api is for getting all users
+connectionRouter.get("/user/feeds", async (req, res) => {
+  try {
+    const userId=req.user._id;
+    const usersConnections=await ConnectionRequestModel.find({
+      $or:[{fromUserId:userId},{toUserId:userId}]
+    }).select("toUserId fromUserId")
+    
+    
+    const hideFromUser= new Set();
+    
+    usersConnections.forEach((connection)=>{
+      console.log(connection);
+      hideFromUser.add(connection.toUserId);
+      hideFromUser.add(connection.fromUserId);
+    })
+    
+    const users = await UserModel.find({
+     $and:[{_id:{$nin:Array.from(hideFromUser)}},{_id:{$ne:userId}}]
+    }).select(USER_SAFE_DATA)
+    
+    if (users.length !== 0) {
+     return res.status(200).json({
+        users: users,
+      });
+    } else {
+      return res.status(200).json({
+        message: "No users existed!",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      error: e.message,
+    });
+  }
+});
+
+
 module.exports = { connectionRouter };
