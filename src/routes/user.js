@@ -3,7 +3,7 @@ const { signInToken, verifyToken } = require("../middlewares/auth");
 const { validateData, validateSignIn } = require("../utils/validation");
 const { hashPassword, checkPassword } = require("../utils/hashing");
 const { UserModel } = require("../models/user");
-const { ConnectionRequestModel } = require("../models/connection");
+
 
 const authRouter = express.Router();
 
@@ -75,20 +75,13 @@ try {
   }
 });
 
-// This api is for getting user profile
-// authRouter.get("/feed",verifyToken,async (req,res)=>{
-//   const userId=req.user._id;
-//   const userConnections = await ConnectionRequestModel.find({
-//     $or:[{fromUserId:userId},{toUserId:userId}]
-//   })
-// console.log("connection requests :" ,userConnections);
+// This api is for logout 
+authRouter.post("/logout",async(req,res)=>{
+  
+  res.status(200).clearCookie("token").json({
+    message:"Logout successful!"
+  })
 
-//   // if(!userConnections){
-//   //   return res.status(200).json({
-//   //     message:"Your feed is empty!"
-//   //   })
-//   // }
+})
 
-
-// })
 module.exports = { authRouter };

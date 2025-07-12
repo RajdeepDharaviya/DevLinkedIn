@@ -10,14 +10,24 @@ const signInToken = async (id) => {
 
 const verifyToken = async (req, res, next) => {
   const cookies = req.cookies;
+  if(!cookies.token){
+    return res.status(401).json({message:"Token is not found!"})
+  }
   try {
     const tokenData = await jwt.verify(cookies.token, SECRET_KEY);
     if (!tokenData) {
-      throw new Error("Invalid token!");
+      console.log('====================================');
+      console.log("token not found");
+      console.log('====================================');
+       return res.status(401).json({
+        message:"Please login"
+      })
     }
     const user = await UserModel.findById(tokenData.id);
     if (!user) {
-      throw new Error("No token is matching!");
+      return res.status(401).json({
+        message:"No user is found or invalid token"
+      })
     }
     req.user = user;
     next();
