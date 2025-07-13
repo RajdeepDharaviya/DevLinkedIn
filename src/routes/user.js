@@ -1,5 +1,5 @@
 const express = require("express");
-const { signInToken, verifyToken } = require("../middlewares/auth");
+const { signInToken } = require("../middlewares/auth");
 const { validateData, validateSignIn } = require("../utils/validation");
 const { hashPassword, checkPassword } = require("../utils/hashing");
 const { UserModel } = require("../models/user");
@@ -7,10 +7,7 @@ const { UserModel } = require("../models/user");
 const authRouter = express.Router();
 
 // This api is for adding user or signup
-authRouter.post("/signup", async (req, res) => {
-  // This function is checking data is valid or not
-  validateData(req.body);
-
+authRouter.post("/signup", validateData, async (req, res) => {
   // This function is for hashing of password
   const hashedPassword = await hashPassword(req.body.password);
 
@@ -44,16 +41,15 @@ authRouter.post("/signup", async (req, res) => {
 });
 
 // This api is for signing user
-authRouter.post("/signin", async (req, res) => {
+authRouter.post("/signin", validateSignIn, async (req, res) => {
   // This function is checking data is valid or not
-  validateSignIn(req.body);
+  // validateSignIn(req.body);
   try {
     // Checking a email id
     const isUserExist = await UserModel.findOne({ emailId: req.body.emailId });
 
     if (!isUserExist) {
-      res.status(203).json({ message: "Email id is not match!" });
-      return;
+      return res.status(400).json({ message: "Email id is not match!" });
     }
 
     // This function is for hashing of password
@@ -62,8 +58,7 @@ authRouter.post("/signin", async (req, res) => {
       isUserExist.password
     );
     if (!isValidPassword) {
-      res.status(203).json({ message: "password is not match!" });
-      return;
+      return res.status(400).json({ message: "password is not match!" });
     }
 
     const token = await signInToken(isUserExist._id);
@@ -75,7 +70,6 @@ authRouter.post("/signin", async (req, res) => {
 
     res.status(200).json({
       user: isUserExist,
-      token: token,
     });
   } catch (e) {
     res.status(400).json({
