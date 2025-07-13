@@ -104,13 +104,13 @@ connectionRouter.get("/connections", async (req, res) => {
       "gender",
       "skills",
     ]);
+
   const connectionData = connections.map((connection) => {
-    if (connection.fromUserId._id === userId) {
+    if (connection.fromUserId._id.toString() === userId.toString()) {
       return connection.toUserId;
     }
     return connection.fromUserId;
   });
-
   if (!connections) {
     return res.status(200).json({
       message: "You don't have any connection!",

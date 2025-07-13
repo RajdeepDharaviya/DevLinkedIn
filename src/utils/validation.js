@@ -5,18 +5,18 @@ const validateData = (body) => {
   const { firstName, lastName, emailId, password, age } = body;
 
   if (!firstName || !lastName) {
-    throw new Error("Please enter all fields!");
+    res.status(411).json({ message: "Please enter all fields!" });
   }
   if (!validator.isEmail(emailId)) {
-    throw new Error("Please enter valid email id !");
+    res.status(411).json({ message: "Please enter valid email id !" });
   }
   if (!validator.isStrongPassword(password)) {
-    throw new Error("Please enter strong password!");
+    res.status(411).json({ message: "Please enter strong password!" });
   }
-  
+
   if (!isNaN(age)) {
     if (age < 0) {
-      throw new Error("Please enter valid age!");
+      res.status(411).json({ message: "Please enter valid age!" });
     }
   }
 };
@@ -25,10 +25,10 @@ const validateSignIn = (body) => {
   const { emailId, password } = body;
 
   if (!password) {
-    throw new Error("Please enter password!");
+    res.status(411).json("Please enter password!");
   }
   if (!validator.isEmail(emailId)) {
-    throw new Error("Please enter valid email id !");
+    res.status(411).json("Please enter valid email id !");
   }
 };
 module.exports = { validateData, validateSignIn };
