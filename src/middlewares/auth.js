@@ -1,33 +1,32 @@
 const jwt = require("jsonwebtoken");
 const { UserModel } = require("../models/user");
-const SECRET_KEY = "devTinder@123";
 
 const signInToken = async (id) => {
-  const token = await jwt.sign({ id: id }, SECRET_KEY);
+  const token = await jwt.sign({ id: id }, process.env.JWT_SECRET_KEY);
 
   return token;
 };
 
 const verifyToken = async (req, res, next) => {
   const cookies = req.cookies;
-  if(!cookies.token){
-    return res.status(401).json({message:"Token is not found!"})
+  if (!cookies.token) {
+    return res.status(401).json({ message: "Token is not found!" });
   }
   try {
-    const tokenData = await jwt.verify(cookies.token, SECRET_KEY);
+    const tokenData = await jwt.verify(cookies.token, JWT_SECRET_KEY);
     if (!tokenData) {
-      console.log('====================================');
+      console.log("====================================");
       console.log("token not found");
-      console.log('====================================');
-       return res.status(401).json({
-        message:"Please login"
-      })
+      console.log("====================================");
+      return res.status(401).json({
+        message: "Please login",
+      });
     }
     const user = await UserModel.findById(tokenData.id);
     if (!user) {
       return res.status(401).json({
-        message:"No user is found or invalid token"
-      })
+        message: "No user is found or invalid token",
+      });
     }
     req.user = user;
     next();

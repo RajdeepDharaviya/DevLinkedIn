@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
-const { connectDB } = require("../config/database");
 const validator = require("validator");
 
-connectDB();
 // creating a user schema with required fields
 const userSchema = mongoose.Schema(
   {
