@@ -3,17 +3,22 @@ const { UserModel } = require("../models/user");
 
 const signInToken = async (id) => {
   const token = await jwt.sign({ id: id }, process.env.JWT_SECRET_KEY);
-
   return token;
 };
 
 const verifyToken = async (req, res, next) => {
   const cookies = req.cookies;
   if (!cookies.token) {
-    return res.status(401).json({ message: "Token is not found!" });
+    console.log("====================================");
+    console.log(cookies.token);
+    console.log("====================================");
+    return res.status(401).json({ message: "Token is found!" });
   }
   try {
-    const tokenData = await jwt.verify(cookies.token, JWT_SECRET_KEY);
+    const tokenData = await jwt.verify(
+      cookies.token,
+      process.env.JWT_SECRET_KEY
+    );
     if (!tokenData) {
       console.log("====================================");
       console.log("token not found");
