@@ -178,10 +178,9 @@ connectionRouter.get("/feed", async (req, res) => {
         { _id: { $nin: Array.from(hideFromUser) } },
         { _id: { $ne: userId } },
       ],
-    })
-      .select(USER_SAFE_DATA)
-      .skip(skip)
-      .limit(limit);
+    }).select(USER_SAFE_DATA);
+    // .skip(skip)
+    // .limit(limit);
 
     if (users.length !== 0) {
       return res.status(200).json({
