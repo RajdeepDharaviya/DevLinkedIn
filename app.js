@@ -6,10 +6,12 @@ const { authRouter } = require("./src/routes/user");
 const { profileRouter } = require("./src/routes/profile");
 const { connectionRouter } = require("./src/routes/connection");
 const { connectDB } = require("./src/config/database");
+const http = require("http");
+const { initializeSocket } = require("./src/utils/socketio");
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://192.168.227.127:5173", "http://localhost:5173"],
     credentials: true,
   })
 );
@@ -21,13 +23,19 @@ app.use("/user", authRouter);
 app.use("/user", profileRouter);
 app.use("/user", connectionRouter);
 
+// Creating a server for socket
+const server = http.createServer(app);
+
+// This function will handle a socket events and initialization
+initializeSocket(server);
+
 connectDB()
   .then(() => {
     console.log("====================================");
     console.log("Database connection establish successfully!");
     console.log("====================================");
 
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, "0.0.0.0", () => {
       console.log("Server started at port : ", process.env.PORT);
     });
   })
