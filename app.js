@@ -8,6 +8,7 @@ const { connectionRouter } = require("./src/routes/connection");
 const { connectDB } = require("./src/config/database");
 const http = require("http");
 const { initializeSocket } = require("./src/utils/socketio");
+const { chatRouter } = require("./src/routes/chat");
 
 app.use(
   cors({
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use("/user", authRouter);
 app.use("/user", profileRouter);
 app.use("/user", connectionRouter);
+app.use("/user", chatRouter);
 
 // Creating a server for socket
 const server = http.createServer(app);
