@@ -32,6 +32,7 @@ authRouter.post("/signup", validateData, async (req, res) => {
 
     res.status(200).json({
       message: "User Created successfully",
+      user: newUser,
     });
   } catch (e) {
     res.status(400).json({
